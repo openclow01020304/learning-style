@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>学习风格测试</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230b1220'/%3E%3Ccircle cx='16' cy='16' r='7' fill='none' stroke='%2338bdf8' stroke-width='2.4'/%3E%3Cpath d='M16 3v5M16 24v5M3 16h5M24 16h5' stroke='%23a78bfa' stroke-width='2.2'/%3E%3C/svg%3E">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  :root {
+    --bg: #0b1220;
+    --card: #16213a;
+    --line: #2b3a55;
+    --brand: #38bdf8;
+    --warm: #a78bfa;
+    --text: #eef2fb;
+    --dim: #93a4c0;
+  }
+  html, body { height: 100%; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: radial-gradient(1200px 600px at 50% -10%, #16294a 0%, var(--bg) 60%); color: var(--text); -webkit-font-smoothing: antialiased; }
+  body { padding: 14px; min-height: 100%; display: block; }
+  .app { width: 100%; max-width: 460px; margin: 0 auto; display: flex; flex-direction: column; position: relative; }
+  .page { display: none; flex-direction: column; min-height: calc(100vh - 28px); }
+  .page.active { display: flex; }
+
+  .home-title { font-size: 28px; font-weight: 900; text-align: center; margin-top: 22px; letter-spacing: 1px; background: linear-gradient(90deg, #38bdf8, #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .home-sub { text-align: center; font-size: 12.5px; color: var(--dim); margin: 8px 18px 0; line-height: 1.7; }
+  .input-group { margin: 18px 18px 12px; }
+  .input-group input { width: 100%; padding: 12px; border-radius: 12px; border: 1.5px solid var(--line); background: var(--card); color: #fff; font-size: 15px; outline: none; text-align: center; }
+  .input-group input:focus { border-color: var(--brand); }
+  .btn-main { margin: 4px 18px 14px; padding: 14px; border: none; border-radius: 12px; background: linear-gradient(90deg, #38bdf8, #6ea8fe); color: #07121f; font-size: 17px; font-weight: 800; cursor: pointer; transition: 0.15s; }
+  .btn-main:active { transform: scale(0.98); }
+  .btn-ghost { margin: 10px 18px 18px; padding: 13px; border: 1.5px solid var(--line); border-radius: 12px; background: transparent; color: var(--text); font-size: 15px; cursor: pointer; }
+  .btn-ghost:active { transform: scale(0.98); }
+
+  .dim-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; margin: 16px 18px 4px; }
+  .dg-item { background: rgba(255,255,255,0.035); border: 1px solid var(--line); border-radius: 12px; padding: 10px 8px; font-size: 12.5px; color: var(--dim); text-align: center; line-height: 1.6; }
+  .dg-item b { color: #dbeafe; font-weight: 700; letter-spacing: 0.5px; }
+  .dg-item .dg-sub { display: block; font-size: 11px; color: #6f8099; margin-top: 2px; }
+
+  .sec-title { margin: 8px 18px 8px; font-size: 13px; color: var(--dim); letter-spacing: 0.5px; }
+  .hist-list { margin: 0 18px; display: flex; flex-direction: column; gap: 8px; }
+  .hist-item { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 10px 12px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; cursor: pointer; }
+  .hist-item .hi-type { font-weight: 800; color: var(--brand); letter-spacing: 1px; }
+  .hist-item .hi-name { color: var(--dim); margin-left: 8px; font-weight: 400; }
+  .hist-item .hi-date { color: #64748b; font-size: 11.5px; }
+  .hist-empty { margin: 0 18px; padding: 14px; text-align: center; color: #64748b; font-size: 12.5px; background: rgba(255,255,255,0.03); border-radius: 12px; }
+
+  details.note { margin: 14px 18px 18px; border: 1px solid var(--line); border-radius: 12px; padding: 0 12px; background: rgba(255,255,255,0.02); }
+  details.note summary { cursor: pointer; list-style: none; padding: 11px 0; font-size: 13px; color: var(--dim); }
+  details.note summary::-webkit-details-marker { display: none; }
+  details.note summary::after { content: "＋"; float: right; color: var(--brand); }
+  details.note[open] summary::after { content: "－"; }
+  details.note .note-body { font-size: 12.5px; line-height: 1.85; color: var(--dim); padding: 0 0 12px; }
+  details.note .note-body b { color: #cbd5e1; font-weight: 600; }
+
+  .quiz-top { display: flex; justify-content: space-between; align-items: center; font-size: 12.5px; color: var(--dim); margin: 10px 4px 8px; }
+  .quiz-top .q-now { color: var(--brand); font-weight: 700; }
+  .progress-wrap { height: 6px; background: #1b2740; border-radius: 4px; overflow: hidden; margin: 0 4px 18px; }
+  .progress { height: 100%; width: 0%; background: linear-gradient(90deg, #38bdf8, #a78bfa); transition: width 0.25s ease; }
+  .q-card { background: var(--card); border: 1px solid var(--line); border-radius: 18px; padding: 26px 18px 22px; }
+  .q-tip { font-size: 12px; color: var(--dim); margin-bottom: 12px; letter-spacing: 0.5px; }
+  .q-text { font-size: 18px; line-height: 1.75; font-weight: 600; margin-bottom: 22px; min-height: 64px; }
+  .opt { display: flex; gap: 12px; align-items: flex-start; width: 100%; text-align: left; padding: 16px 14px; margin-bottom: 11px; border-radius: 14px; border: 1.5px solid var(--line); background: #101a2e; color: var(--text); font-size: 15px; line-height: 1.6; cursor: pointer; transition: 0.15s; }
+  .opt:active { transform: scale(0.99); }
+  .opt:hover { border-color: rgba(56,189,248,0.55); }
+  .opt .badge { flex: none; width: 26px; height: 26px; border-radius: 8px; background: #1e2f4d; color: var(--brand); font-size: 13px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+  .opt.picked { border-color: var(--brand); background: #10253c; }
+  .opt.picked .badge { background: var(--brand); color: #06121f; }
+  .quiz-foot { display: flex; justify-content: space-between; align-items: center; margin-top: auto; padding: 18px 0 6px; }
+  .btn-back { padding: 9px 16px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--dim); font-size: 13px; cursor: pointer; }
+  .btn-back:disabled { opacity: 0.35; cursor: default; }
+  .quiz-tip { font-size: 11.5px; color: #64748b; }
+
+  .res-top { display: flex; justify-content: flex-end; margin-top: 6px; }
+  .res-top span { font-size: 12.5px; color: var(--dim); padding: 6px 10px; border: 1px solid var(--line); border-radius: 999px; cursor: pointer; }
+  .res-head { text-align: center; margin-top: 6px; }
+  .res-code { font-size: 38px; font-weight: 900; letter-spacing: 4px; line-height: 1.15; background: linear-gradient(90deg, #38bdf8, #a78bfa); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .res-name { font-size: 18px; font-weight: 700; margin-top: 6px; }
+  .res-tag { font-size: 12.5px; color: var(--dim); margin-top: 6px; padding: 0 18px; line-height: 1.7; }
+  .res-card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 16px 16px 12px; margin: 16px 18px 0; }
+  .res-card h3 { font-size: 13px; color: var(--dim); font-weight: 600; margin-bottom: 12px; letter-spacing: 0.5px; }
+  .dim-row { margin-bottom: 14px; }
+  .dim-line { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; font-size: 12px; color: var(--dim); margin-bottom: 6px; }
+  .dim-line b { color: #dbeafe; font-weight: 700; }
+  .dim-bar { height: 8px; border-radius: 4px; background: #22304a; overflow: hidden; display: flex; }
+  .dim-bar .fill { height: 100%; background: linear-gradient(90deg, #38bdf8, #8bb6ff); }
+  .dim-bar .fill2 { height: 100%; background: linear-gradient(90deg, #7c6cf0, #a78bfa); }
+  .dim-hint { font-size: 11.5px; color: #7c8ba8; margin-top: 6px; }
+  .res-desc { font-size: 14px; line-height: 1.9; color: #dbe3f3; }
+  .two-col { display: flex; flex-direction: column; gap: 0; }
+  .list-block { margin-bottom: 10px; }
+  .list-block .lb-title { font-size: 12.5px; font-weight: 700; margin-bottom: 6px; }
+  .list-block.good .lb-title { color: #4ade80; }
+  .list-block.blind .lb-title { color: #fbbf24; }
+  .list-block li { list-style: none; font-size: 13.5px; line-height: 1.85; color: #cad5e6; padding-left: 14px; position: relative; }
+  .list-block li::before { content: ""; position: absolute; left: 0; top: 9px; width: 5px; height: 5px; border-radius: 50%; background: #475569; }
+  .res-tip { font-size: 13.5px; line-height: 1.9; color: #cad5e6; white-space: pre-line; }
+  .disclaimer { margin: 14px 18px 0; font-size: 11.5px; line-height: 1.8; color: #64748b; text-align: center; }
+  .ver { text-align: center; font-size: 11px; color: #475569; margin: 14px 0 6px; }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <div id="pageHome" class="page active">
+    <div class="home-title">学习风格测试</div>
+    <div class="home-sub">20 题 · 约 3 分钟 · 四种偏好组合<br>凭第一感觉选，没有对错</div>
+    <div class="input-group"><input type="text" id="nicknameInput" placeholder="输入昵称（用于保存记录）" maxlength="10"></div>
+    <button class="btn-main" id="btnStart">开始测试</button>
+    <div class="dim-grid">
+      <div class="dg-item"><b>V 画面</b><span class="dg-sub">看图、看表最省力</span></div>
+      <div class="dg-item"><b>A 声音</b><span class="dg-sub">听着、念着记得牢</span></div>
+      <div class="dg-item"><b>R 文字</b><span class="dg-sub">读写、抄写更踏实</span></div>
+      <div class="dg-item"><b>K 动手</b><span class="dg-sub">做着、试一遍就会</span></div>
+    </div>
+    <div class="sec-title" id="histTitle">我的历史结果</div>
+    <div class="hist-list" id="histList"></div>
+    <details class="note">
+      <summary>这个测试怎么算的</summary>
+      <div class="note-body">
+        20 道题，每题四个选项，分别对应 <b>V 画面</b>、<b>A 声音</b>、<b>R 文字</b>、<b>K 动手</b>。
+        选哪个，对应那一类加 1 分，满分各 20 分。<br>
+        分数最高的两类组成你的结果，前一个代表更明显的偏好，后一个代表次要偏好。
+        每题选项的排列顺序是随机打乱的，不存在「总选第一个」就能得出固定答案的情况。<br>
+        本页题目与解释均为自编，<b>不是任何官方量表</b>，结果只作学习方式的参考，不作诊断、选科或评价依据。
+      </div>
+    </details>
+    <div class="ver">学习风格测试 v1 · VARK 20 题</div>
+  </div>
+
+  <div id="pageQuiz" class="page">
+    <div class="quiz-top">
+      <span>第 <b id="qNow" class="q-now">1</b> / <span id="qTotal">20</span> 题</span>
+      <span id="qPct">0%</span>
+    </div>
+    <div class="progress-wrap"><div class="progress" id="progressBar"></div></div>
+    <div class="q-card">
+      <div class="q-tip" id="qTip">哪种方式对你更顺手？</div>
+      <div class="q-text" id="qText">加载中…</div>
+      <div id="optBox"></div>
+    </div>
+    <div class="quiz-foot">
+      <button class="btn-back" id="btnPrev">上一题</button>
+      <span class="quiz-tip">选完自动进入下一题</span>
+      <button class="btn-back" id="btnQuit">退出</button>
+    </div>
+  </div>
+
+  <div id="pageResult" class="page">
+    <div class="res-top"><span id="btnResHome">返回首页</span></div>
+    <div class="res-head">
+      <div class="res-code" id="resCode">V·K</div>
+      <div class="res-name" id="resName">画面派 · 动手派</div>
+      <div class="res-tag" id="resTag"></div>
+    </div>
+    <div class="res-card">
+      <h3>四种方式你各占多少</h3>
+      <div id="dimBox"></div>
+    </div>
+    <div class="res-card">
+      <h3>你大概是这种人</h3>
+      <div class="res-desc" id="resDesc"></div>
+    </div>
+    <div class="res-card two-col">
+      <h3>顺手的地方与容易踩的坑</h3>
+      <div class="list-block good"><div class="lb-title">比较顺的地方</div><ul id="goodList"></ul></div>
+      <div class="list-block blind"><div class="lb-title">容易吃亏的地方</div><ul id="blindList"></ul></div>
+    </div>
+    <div class="res-card">
+      <h3>学校里怎么用这个优势</h3>
+      <div class="res-tip" id="schoolText"></div>
+    </div>
+    <div class="res-card">
+      <h3>刷题工具该怎么调</h3>
+      <div class="res-tip" id="toolText"></div>
+    </div>
+    <div class="res-card">
+      <h3>一句话建议</h3>
+      <div class="res-tip" id="resTip"></div>
+    </div>
+    <div class="disclaimer">自编题目，非官方量表；结果仅供了解自己的学习方式，不作诊断或评价依据。</div>
+    <button class="btn-ghost" id="btnAgain" style="margin-top:16px;">再测一次</button>
+    <button class="btn-ghost" id="btnHome">返回首页</button>
+    <div class="ver" id="resVer">学习风格测试 v1</div>
+  </div>
+
+</div>
+<script>
+/* ===== 题库：20 题，每题四选项依次对应 V画面 / A声音 / R文字 / K动手 ===== */
+const QS = [
+  { q: "老师讲一个新知识点，你心里更希望他怎么讲？",
+    opts: [ "边讲边画图、板书清楚点，我好看明白", "多口头讲两遍，我听着就懂", "把要点写出来，我照着记", "讲完直接给两道题让我试试" ] },
+  { q: "一个陌生单词，怎么记你最省劲？",
+    opts: [ "旁边配张图，关键地方标上颜色", "跟着音频读几遍，靠发音记", "边读边在本子上写，写熟了才踏实", "拿它造两个句子、做两道题" ] },
+  { q: "这节课刚学完，你想怎么收个尾？",
+    opts: [ "画个框架图，把知识点串起来", "小声给自己讲一遍讲了啥", "把笔记重新抄整齐", "挑几道题练一下手" ] },
+  { q: "考前只剩一个晚上，你心里更愿意怎么过？",
+    opts: [ "翻思维导图、图表，整体捋一遍", "听音频、念重点，靠耳朵进脑子", "快速翻笔记，把要点再抄一遍", "直接刷一套模拟题，边做边找漏洞" ] },
+  { q: "有段材料死活记不住，你觉得哪招更管用？",
+    opts: [ "把它做成一张图，看一眼就明白", "念出声，听自己的声音反复过", "抄几遍，手写下来就记住了", "改成填空题，自己考自己" ] },
+  { q: "上实验课，你最来劲的是哪一步？",
+    opts: [ "研究装置图、流程示意图", "听老师讲步骤和注意点", "读实验报告里的原理文字", "自己上手，把实验做出来" ] },
+  { q: "背古诗文，哪种方式让你记得更牢？",
+    opts: [ "看分层结构图，先明白它怎么写的", "听朗诵、自己跟着读，读出感觉", "抄写，一句一句看注释", "做默写题，写错了再补" ] },
+  { q: "理科公式定理，你想怎么把它弄懂？",
+    opts: [ "看推导图示、几何图，图形一看就通", "听老师口头把道理解释一遍", "抄公式，顺着文字推导看下去", "代进例题算一遍，算过才算懂" ] },
+  { q: "错题本，你更想怎么用？",
+    opts: [ "把错因画成流程图，一眼看出断在哪", "把思路讲给自己听一遍", "抄写解析里的关键句", "标记好，隔几天重做一遍" ] },
+  { q: "自己开一章新课，你想从哪儿下手？",
+    opts: [ "先翻图、看目录框架，心里有个地图", "找段音频讲解听一遍", "从头通读课本文字", "先做几道入门小题，试试水" ] },
+  { q: "小组讨论一道难题，你最想出力的是？",
+    opts: [ "上去把思路画出来", "把想法讲给大家听", "把结论记下来整理成文", "提议一起把例题做一遍" ] },
+  { q: "哪种课堂你最坐不住？",
+    opts: [ "只有声音，黑板上啥也没有", "只有板书，老师一句不讲", "只放图，不给文字说明", "全程坐着听，不让动手做题" ] },
+  { q: "记地理地形位置，你更信哪种？",
+    opts: [ "多看地图，位置一看就明白", "口头描述一遍位置特点", "抄地理笔记里的文字", "做填空题、选择题反复练" ] },
+  { q: "政治素材老背不下来，你想怎么办？",
+    opts: [ "画成逻辑结构图，先看框架", "念出声，反复读几遍", "摘抄关键句，一条条整理", "做主观题，边答边记" ] },
+  { q: "英语听力，你更能接受哪种练法？",
+    opts: [ "边听边看文本，把重点划出来", "纯听，多听几遍听熟", "听写完整，再对照原文改", "听完马上做题，检验听没听懂" ] },
+  { q: "作文素材，你想怎么存进脑子？",
+    opts: [ "做成素材分类图，分块放好", "听范文朗读，听出语感", "摘抄好句子", "直接写一小段练手" ] },
+  { q: "想查漏补缺，你先干什么？",
+    opts: [ "列一张知识框架，看哪儿空着", "找段音频讲解补一遍", "读课本相关段落", "找专题题刷一通" ] },
+  { q: "老师发了一份复习提纲，你怎么用？",
+    opts: [ "看框架和标记，先看懂结构", "把要点念一遍", "抄下重点", "对着提纲刷题自测" ] },
+  { q: "一单元学完，怎么才算「我是真会了」？",
+    opts: [ "自己能画出这单元的框架", "合上书能完整讲一遍", "笔记能梳理得顺", "单元卷能做对" ] },
+  { q: "上着上着走神了，哪招最能把你拉回来？",
+    opts: [ "换点有图有表的东西看", "读出声，靠声音把自己喊回来", "动笔写，写起来就不飘了", "起来做几道题，动一动" ] }
+];
+
+/* ===== 四套资料：自编文本，非官方量表 ===== */
+const TYPES = {
+  V: {
+    name: "画面派", letter: "V", full: "视觉",
+    tag: "看图看表就懂，光听人讲容易飘",
+    desc: "你脑子里存的多是画面：板书长什么样、知识点在哪一页、用什么颜色标的。信息一变成图、变成表，你立刻就能抓住结构；纯听讲的时候，如果眼前没有东西可看，注意力很容易自己滑走。",
+    good: ["能一眼看出知识的整体结构", "对图表、位置、颜色记得特别牢", "复杂内容一画就变清楚"],
+    blind: ["光听不看，容易走神", "不爱动笔，答题时写不出细节", "图看得多，文字表述练得少"],
+    school: "上课盯板书和课件，重点看老师怎么画结构；课后把一节内容整理成一张图，比反复读文字管用；复习先翻自己那摞框架图；主观题要刻意练写，别停在「我脑子里都懂」。",
+    tool: "刷题把题干朗读关掉，别让声音干扰；做题时盯题干里的图表和关键词；错题别只抄，把错因画成一条线，一眼看出断在哪；文字类的背诵，先做分类图再背。",
+    tip: "图能帮你记住，但考试要写字。每周挑两道主观题，逼自己用文字完整写一遍。"
+  },
+  A: {
+    name: "声音派", letter: "A", full: "听觉",
+    tag: "读出来、听一遍，比默看十遍管用",
+    desc: "你的耳朵比眼睛好使。念一遍、听一遍、讲一遍，内容就进去了；埋头看书时间一长，脑子会自己放空，你甚至读完了却不知道读了什么。",
+    good: ["听一遍就能抓住重点", "口头表达顺，讲题讲得清", "靠朗读记得住，背诵效率高"],
+    blind: ["只看不念，容易看了等于没看", "容易被环境声音带跑", "不爱动笔，书写细节弱"],
+    school: "上课跟着老师的口述走，别只顾抄；背东西一定念出声；重点内容自己录一段，走路、吃饭时听；给别人讲一遍，是最高效的复习。",
+    tool: "刷题开语音朗读，题干、解析都听着过；背诵板块用跟读模式；做完一道题，合上屏幕把知识点讲一遍，讲顺了才算真记住。",
+    tip: "念出来很好用，但考试是静音的。挑几块内容改成默读加默写，提前适应考场。"
+  },
+  R: {
+    name: "文字派", letter: "R", full: "读写",
+    tag: "写下来的东西才踏实，看和听总觉得虚",
+    desc: "你信自己的手和笔。读文字、抄笔记、默写，这几样做完，知识就真正到你手里了；光看图、光听，你总有点没底，非要落到文字上才放心。",
+    good: ["笔记完整，复习有据可依", "文字表达细，主观题占优势", "抄写记忆牢，细节记得住"],
+    blind: ["抄得多、想得少，容易只动手不动脑", "整理花太多时间，练题不够", "遇到图表、空间类内容偏慢"],
+    school: "笔记自己写，别只拍照；重点主动抄一遍；主观题一定动笔；复习就是翻自己的文字，读着读着就回来了；但别把时间全花在整理上。",
+    tool: "刷完题把解析关键句抄一遍，别嫌麻烦；主观题写完再对照标准答案看差距；多用默写类练习，手写一遍顶看三遍；整理错题时顺手写一句「我错在哪」。",
+    tip: "笔记越漂亮不等于越会。每次整理完，立刻做两道题检验，别只沉浸在抄写的踏实感里。"
+  },
+  K: {
+    name: "动手派", letter: "K", full: "动觉",
+    tag: "做一遍、错一次，反而学得最快",
+    desc: "你坐着干看会难受。上手做、试一次、错一次，知识才真的进来；长时间不动手，注意力就散了，看着像在学，其实没进脑子。",
+    good: ["上手快，实操类内容强", "不怕出错，改得快", "在练习中效率最高"],
+    blind: ["静不下来，长材料啃不动", "跳过理解直接做题，容易反复错", "不爱整理，错题看完就忘"],
+    school: "别硬坐两小时，切成小段，中间活动一下；靠做题往前推进，而不是靠看书；不会的先做，错了再回头补原理。",
+    tool: "一次别刷太多，设成小批次，做完一段歇一会；错题优先反复刷，别只整理；把大任务切成几轮短练习，隔开做，比连轴转有效。",
+    tip: "做题很爽，但别跳过「为什么」。每道错题多花一分钟说清错因，比再刷十道新题有用。"
+  }
+};
+
+const DIM_KEYS = [
+  { key: "V", label: "画面" },
+  { key: "A", label: "声音" },
+  { key: "R", label: "文字" },
+  { key: "K", label: "动手" }
+];
+const HIST_KEY = "vark_hist_v1";
+const state = { nick: "", idx: 0, ans: new Array(QS.length).fill(null), order: [], optOrder: {}, busy: false };
+
+function $(id) { return document.getElementById(id); }
+function show(name) {
+  ["pageHome", "pageQuiz", "pageResult"].forEach(function (p) {
+    $(p).classList.toggle("active", p === "page" + name);
+  });
+  window.scrollTo(0, 0);
+}
+
+function getHist() {
+  try {
+    var raw = localStorage.getItem(HIST_KEY);
+    var arr = raw ? JSON.parse(raw) : [];
+    return Array.isArray(arr) ? arr : [];
+  } catch (e) { return []; }
+}
+function saveHist(rec) {
+  try {
+    var arr = getHist();
+    arr.unshift(rec);
+    localStorage.setItem(HIST_KEY, JSON.stringify(arr.slice(0, 6)));
+  } catch (e) { }
+}
+
+function renderHome() {
+  var arr = getHist();
+  var box = $("histList");
+  if (!arr.length) {
+    box.innerHTML = '<div class="hist-empty">还没有记录，测一次就会出现</div>';
+    return;
+  }
+  box.innerHTML = arr.map(function (r, i) {
+    var p = TYPES[r.p] || {}, s = TYPES[r.s] || {};
+    return '<div class="hist-item" data-i="' + i + '">' +
+      '<span><span class="hi-type">' + r.p + "·" + r.s + '</span><span class="hi-name">' +
+      (p.name || "") + " · " + (s.name || "") + '</span></span>' +
+      '<span class="hi-date">' + r.d + '</span></div>';
+  }).join("");
+  Array.prototype.forEach.call(box.querySelectorAll(".hist-item"), function (el) {
+    el.addEventListener("click", function () {
+      var r = getHist()[parseInt(el.getAttribute("data-i"), 10)];
+      if (r) renderResult(r);
+    });
+  });
+}
+
+function shuffleArr(arr) {
+  var a = arr.slice();
+  for (var j = a.length - 1; j > 0; j--) {
+    var k = Math.floor(Math.random() * (j + 1));
+    var t = a[j]; a[j] = a[k]; a[k] = t;
+  }
+  return a;
+}
+
+function startTest() {
+  var name = ($("nicknameInput").value || "").trim();
+  if (!name) {
+    $("nicknameInput").focus();
+    $("nicknameInput").placeholder = "先填个昵称再开始";
+    return;
+  }
+  state.nick = name;
+  state.idx = 0;
+  state.ans = new Array(QS.length).fill(null);
+  state.order = shuffleArr(Array.from({ length: QS.length }, function (_, i) { return i; }));
+  state.optOrder = {};
+  state.busy = false;
+  show("Quiz");
+  renderQ();
+}
+
+function renderQ() {
+  var qi = state.order[state.idx];
+  var q = QS[qi];
+  /* 每题选项顺序随机，避免总点同一个位置 */
+  if (!state.optOrder[qi]) {
+    state.optOrder[qi] = shuffleArr([0, 1, 2, 3]);
+  }
+  var ord = state.optOrder[qi];
+
+  $("qNow").textContent = state.idx + 1;
+  $("qTotal").textContent = QS.length;
+  $("qPct").textContent = Math.round(state.idx / QS.length * 100) + "%";
+  $("progressBar").style.width = (state.idx / QS.length * 100) + "%";
+  $("qText").textContent = q.q;
+
+  var cur = state.ans[qi];
+  var box = $("optBox");
+  box.innerHTML = "";
+  ord.forEach(function (oi, pos) {
+    var btn = document.createElement("button");
+    btn.className = "opt" + (cur === oi ? " picked" : "");
+    btn.innerHTML = '<span class="badge">' + "ABCD".charAt(pos) + '</span><span>' + q.opts[oi] + '</span>';
+    btn.addEventListener("click", function () { pick(oi, btn); });
+    box.appendChild(btn);
+  });
+  $("btnPrev").disabled = state.idx === 0;
+}
+
+function pick(v, btn) {
+  if (state.busy) return;
+  state.busy = true;
+  state.ans[state.order[state.idx]] = v;
+  Array.prototype.forEach.call($("optBox").children, function (c) { c.classList.remove("picked"); });
+  btn.classList.add("picked");
+  setTimeout(function () {
+    state.busy = false;
+    if (state.idx < QS.length - 1) {
+      state.idx++;
+      renderQ();
+    } else {
+      $("progressBar").style.width = "100%";
+      $("qPct").textContent = "100%";
+      finish();
+    }
+  }, 160);
+}
+
+function prevQ() {
+  if (state.idx === 0 || state.busy) return;
+  state.idx--;
+  renderQ();
+}
+
+function calc() {
+  /* 选项下标 0/1/2/3 依次对应 V/A/R/K */
+  var cnt = { V: 0, A: 0, R: 0, K: 0 };
+  QS.forEach(function (q, i) {
+    var sel = state.ans[i];
+    if (sel === null || sel === undefined) return;
+    cnt[DIM_KEYS[sel].key]++;
+  });
+  var arr = Object.keys(cnt).map(function (k) { return { k: k, v: cnt[k] }; });
+  arr.sort(function (a, b) { return b.v - a.v; });
+  return { p: arr[0].k, s: arr[1].k, cnt: cnt };
+}
+
+function finish() {
+  var res = calc();
+  var rec = { nick: state.nick, p: res.p, s: res.s, cnt: res.cnt, d: fmtDate(new Date()) };
+  saveHist(rec);
+  renderResult(rec);
+}
+
+function fmtDate(d) {
+  function pad(n) { return n < 10 ? "0" + n : "" + n; }
+  return (d.getMonth() + 1) + "月" + d.getDate() + "日 " + pad(d.getHours()) + ":" + pad(d.getMinutes());
+}
+
+function renderResult(rec) {
+  var p = TYPES[rec.p] || TYPES.V;
+  var s = TYPES[rec.s] || TYPES.A;
+  var cnt = rec.cnt || { V: 0, A: 0, R: 0, K: 0 };
+  var total = QS.length;
+
+  $("resCode").textContent = p.letter + "·" + s.letter;
+  $("resName").textContent = p.name + " · " + s.name;
+  $("resTag").textContent = p.tag;
+
+  var maxV = Math.max(cnt.V, cnt.A, cnt.R, cnt.K) || 1;
+  $("dimBox").innerHTML = DIM_KEYS.map(function (d) {
+    var v = cnt[d.key] || 0;
+    var w = Math.round(v / maxV * 100);
+    var isTop = (d.key === rec.p);
+    return '<div class="dim-row">' +
+      '<div class="dim-line"><span><b>' + d.key + '</b> ' + d.label + ' ' + v + ' / ' + total + '</span>' +
+      '<span>' + (isTop ? "最顺手" : (d.key === rec.s ? "次顺手" : "用得少")) + '</span></div>' +
+      '<div class="dim-bar"><div class="' + (isTop || d.key === rec.s ? "fill" : "fill2") + '" style="width:' + w + '%"></div></div>' +
+      '</div>';
+  }).join("");
+
+  $("resDesc").textContent = "【主 · " + p.name + "】" + p.desc + "\n\n【次 · " + s.name + "】" + s.desc;
+  $("goodList").innerHTML = p.good.map(function (x) { return "<li>" + x + "</li>"; }).join("");
+  $("blindList").innerHTML = p.blind.map(function (x) { return "<li>" + x + "</li>"; }).join("");
+  $("schoolText").textContent = "【" + p.name + "】" + p.school + "\n\n【" + s.name + "】" + s.school;
+  $("toolText").textContent = "【" + p.name + "】" + p.tool + "\n\n【" + s.name + "】" + s.tool;
+  $("resTip").textContent = p.tip + "\n" + s.tip;
+  $("resVer").textContent = "学习风格测试 v1 · " + (rec.nick ? rec.nick + " 的结果" : "");
+  show("Result");
+}
+
+function again() {
+  state.idx = 0;
+  state.ans = new Array(QS.length).fill(null);
+  state.order = shuffleArr(Array.from({ length: QS.length }, function (_, i) { return i; }));
+  state.optOrder = {};
+  state.busy = false;
+  show("Quiz");
+  renderQ();
+}
+function backHome() {
+  renderHome();
+  show("Home");
+}
+
+(function init() {
+  $("histTitle").textContent = "我的历史结果";
+  renderHome();
+  $("btnStart").addEventListener("click", startTest);
+  $("nicknameInput").addEventListener("keydown", function (e) { if (e.key === "Enter") startTest(); });
+  $("btnPrev").addEventListener("click", prevQ);
+  $("btnQuit").addEventListener("click", function () {
+    if (window.confirm("退出后本次作答不保存，确定退出？")) backHome();
+  });
+  $("btnResHome").addEventListener("click", backHome);
+  $("btnAgain").addEventListener("click", again);
+  $("btnHome").addEventListener("click", backHome);
+})();
+</script>
+</body>
+</html>
